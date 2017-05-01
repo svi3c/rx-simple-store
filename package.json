@@ -1,0 +1,25 @@
+{
+  "name": "rx-ts-store",
+  "version": "0.0.1",
+  "description": "A simple rx store solution written in TypeScript",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": "git@github.com:svi3c/rx-simple-store.git",
+  "author": "Sven Reglitzki <sreglitzki@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint 'src/**/*.ts'",
+    "test": "npm run lint && jasmine-ts 'src/**/*.spec.ts'"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^2.5.47",
+    "jasmine-promise-wrapper": "^0.0.2",
+    "jasmine-ts": "^0.1.1",
+    "tslint": "^5.1.0",
+    "typescript": "^2.3.2"
+  },
+  "dependencies": {
+    "rxjs": "^5.3.0"
+  }
+}
