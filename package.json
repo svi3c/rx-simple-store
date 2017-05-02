@@ -3,12 +3,14 @@
   "version": "0.0.1",
   "description": "A simple rx store solution written in TypeScript",
   "main": "lib/index.js",
+  "module": "lib/es2015/index.js",
   "types": "lib/index.d.ts",
   "repository": "git@github.com:svi3c/rx-simple-store.git",
   "author": "Sven Reglitzki <sreglitzki@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "prepublish": "npm run build",
+    "build": "rimraf lib && tsc && tsc --outDir ./lib/es2015 --module es6",
     "lint": "tslint 'src/**/*.ts'",
     "test": "npm run lint && jasmine-ts 'src/**/*.spec.ts'"
   },
@@ -17,6 +19,7 @@
     "jasmine-promise-wrapper": "^0.0.2",
     "jasmine-spec-reporter": "^4.1.0",
     "jasmine-ts": "^0.1.2",
+    "rimraf": "^2.6.1",
     "tslint": "^5.1.0",
     "typescript": "^2.3.2"
   },
