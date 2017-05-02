@@ -1,5 +1,8 @@
 /src
+/spec
 /.editorconfig
+/.npmignore
+/.travis.yml
 /tsconfig.json
 /tslint.json
 /yarn.lock

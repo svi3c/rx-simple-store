@@ -1,5 +1,5 @@
 {
-  "name": "rx-ts-store",
+  "name": "rx-simple-store",
   "version": "0.0.1",
   "description": "A simple rx store solution written in TypeScript",
   "main": "lib/index.js",
@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "prepublish": "npm run build",
-    "build": "rimraf lib && tsc && tsc --outDir ./lib/es2015 --module es6",
+    "build": "rimraf lib && tsc && tsc --outDir ./lib/es2015 --module es6 --target es6",
     "lint": "tslint 'src/**/*.ts'",
     "test": "npm run lint && jasmine-ts 'src/**/*.spec.ts'"
   },
