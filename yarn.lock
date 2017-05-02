@@ -47,7 +47,7 @@ chalk@^1.1.0, chalk@^1.1.1:
     strip-ansi "^3.0.0"
     supports-color "^2.0.0"
 
-colors@^1.1.2:
+colors@1.1.2, colors@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/colors/-/colors-1.1.2.tgz#168a4701756b6a7f51a12ce0c97bfa28c084ed63"
 
@@ -127,9 +127,15 @@ jasmine-promise-wrapper@^0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/jasmine-promise-wrapper/-/jasmine-promise-wrapper-0.0.2.tgz#226a6d6dfa42ede9a39b3a1f0f7c5a6bc86b30c1"
 
-jasmine-ts@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/jasmine-ts/-/jasmine-ts-0.1.1.tgz#bcbc733a5755a5ac4e8a48bce339cf3607f96b84"
+jasmine-spec-reporter@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/jasmine-spec-reporter/-/jasmine-spec-reporter-4.1.0.tgz#b8aa7584df58e4dab61acdbefb76d096aa38663f"
+  dependencies:
+    colors "1.1.2"
+
+jasmine-ts@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/jasmine-ts/-/jasmine-ts-0.1.2.tgz#5e8eb10b2996a8d878ad20e9874fdbd6e27e62d1"
   dependencies:
     jasmine "^2.5.3"
     ts-node "^2.1.0"
