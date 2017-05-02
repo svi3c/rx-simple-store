@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/svi3c/rx-simple-store.svg?branch=master)](https://travis-ci.org/svi3c/rx-simple-store)
+
 # rx-simple-store
 
 This is a simple [rxjs 5](https://github.com/ReactiveX/RxJS) isomorphic implementation of a reactive store, written in TypeScript.
