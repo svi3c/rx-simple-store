@@ -6,21 +6,24 @@ This is a simple [rxjs 5](https://github.com/ReactiveX/RxJS) isomorphic implemen
 
 I was inspired by the article [Redux in a single line of code with RxJS](http://rudiyardley.com/redux-single-line-of-code-rxjs/) by Rudi Yardley.
 
-### What is a reactive store?
+## What is a reactive store?
 
 A reactive store is an application state management solution. It consumes actions and publishes new states via Observables. This way you can react on state changes accross your application.
 
 To get a better understanding of reactive stores, take a look at [redux](http://redux.js.org/docs/introduction/).
 
-### Why another store solution?
+## Why another store solution?
 
 At the moment I write some applications in [Angular](https://angular.io/). There is the [@ngrx/store](https://github.com/ngrx/store) which allows you to have one large application state.
 
-This is fine for apps. But if you want to write reusable Angular modules with components and services, you might consider to have dedicated stores for your independent modules.
+This is fine for apps. But if you want to write reusable feature modules with some components and services, you might consider to have dedicated stores for your independent modules.
 
-### RxStore
+I'm pretty sure that there are other use cases where you want to have multiple stores instead of a single store.
+
+## RxStore
 
 The class that you will be working with is called `RxStore`. It is an Observable with a `dispatch()` method. If you want to react to changes, you can subscribe to it and if you want to trigger a state recalculation, you can `dispatch()` an `Action`. It also holds a reference to the current `state` to gain quick access.
+
 
 The constructor takes a `Reducer` function and an `initialState` object.
 The `Reducer` function handles the actions and may derive and return a new succeding state that will be stored and published.
@@ -29,7 +32,48 @@ It is important to treat the state *immutable*. To achieve this, I recommend to 
 
 Since the reducer is a pure function, it is quite easy to test.
 
-### A Todo Example
+## API
+
+
+### Action interface
+
+An action has a type which serves as a discriminator and an optional payload.
+```ts
+interface Action {
+  type: string;
+  payload?: any;
+}
+```
+
+### Reducer interface
+
+A reducer is a function that takes the current state and an action and returns a state.
+```ts
+(state: S, action: Action) => S
+```
+
+### RxStore
+
+#### `constructor`
+
+Creates a new store instance.
+```ts
+new RxStore<S>(reducer: Reducer<S>, initialState: S);
+```
+
+#### `RxStore.prototype.state`
+
+This is a reference to the current state.
+
+#### `RxStore.prototype.actions$`
+
+The `actions$` is a rxjs `Subject<Action>`. You can use this reference to add side effects when actions are dispatched.
+
+#### `RxStore.prototype.dispatch()`
+
+This takes an `Action` and notifies the `actions$` Subject. Then the reducer is called to retrieve the resulting state.
+
+## A Todo Example
 
 ```ts
 import { RxStore } from "rx-simple-store";
