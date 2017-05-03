@@ -72,9 +72,13 @@ This is a reference to the current state.
 
 The `actions$` is a rxjs `Subject<Action>`. You can use this reference to add side effects when actions are dispatched.
 
-#### `RxStore.prototype.dispatch()`
+#### `RxStore.prototype.dispatch(action: Action)`
 
 This takes an `Action` and notifies the `actions$` Subject. Then the reducer is called to retrieve the resulting state.
+
+#### `RxStore.prototype.set(partialState: Partial<S>)`
+
+A shortcut method to trigger a partial state update. A predefined action of type `[RX_STORE] SET` will be emitted. Note: This is a reserved action type.
 
 ## A Todo Example
 

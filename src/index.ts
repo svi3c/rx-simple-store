@@ -7,12 +7,28 @@ import "rxjs/add/operator/publishReplay";
 import "rxjs/add/operator/scan";
 import "rxjs/add/operator/startWith";
 
+export type Partial<T> = {
+    [P in keyof T]?: T[P];
+};
+
 export interface Action {
   type: string;
   payload?: any;
 }
 
 export type Reducer<S> = (state: S, action: Action) => S;
+
+export const SET_ACTION_TYPE = "[RX_STORE] SET";
+
+function extendReducer<S>(reducer: Reducer<S>) {
+  return (state: S, action: Action) => {
+    if (action.type === SET_ACTION_TYPE && typeof state === "object") {
+      return { ...(state as any as object), ...action.payload };
+    } else {
+      return reducer(state, action);
+    }
+  };
+}
 
 export class RxStore<S> extends Observable<S> {
 
@@ -22,7 +38,7 @@ export class RxStore<S> extends Observable<S> {
   constructor(reducer: Reducer<S>, initialState: S) {
     const actions$ = new Subject<Action>();
     const state$ = actions$
-      .scan(reducer, initialState)
+      .scan(extendReducer(reducer), initialState)
       // Publish initial state
       .startWith(initialState)
       // Do not publish in-place mutations
@@ -41,6 +57,10 @@ export class RxStore<S> extends Observable<S> {
 
   dispatch(action: Action) {
     this.actions$.next(action);
+  }
+
+  set(partialState: Partial<S>) {
+    this.dispatch({ type: SET_ACTION_TYPE, payload: partialState });
   }
 
 }

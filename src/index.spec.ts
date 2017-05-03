@@ -1,5 +1,5 @@
 import { it } from "jasmine-promise-wrapper";
-import { Action, RxStore } from "./index";
+import { Action, RxStore, SET_ACTION_TYPE } from "./index";
 
 import "rxjs/add/operator/delay";
 import "rxjs/add/operator/take";
@@ -97,6 +97,27 @@ describe("RxStore", () => {
 
       expect(states1).toEqual([0, 1, 2, 3]);
       expect(states2).toEqual([0, 1, 2, 3]);
+    });
+
+  });
+
+  describe("set()", () => {
+
+    it("should trigger a partial state update on the store", () => {
+      store = new RxStore((state, action: Action) => state, { a: "b", c: "" });
+
+      store.set({ c: "d" });
+
+      expect(store.state).toEqual({ a: "b", c: "d" });
+    });
+
+    it("should emit an action", async () => {
+      store = new RxStore((state, action: Action) => state, { a: "b", c: "" });
+
+      const actionPromise = store.actions$.take(1).toPromise();
+      store.set({c: "d"});
+
+      expect(await actionPromise).toEqual({type: SET_ACTION_TYPE, payload: {c: "d"}});
     });
 
   });
