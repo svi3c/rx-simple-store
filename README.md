@@ -52,7 +52,7 @@ interface Action {
 
 A reducer is a function that takes the current state and an action and returns a state.
 ```ts
-(state: S, action: Action) => S
+type Reducer<S, A extends Action> = (state: S, action: A) => S
 ```
 
 ### RxStore
@@ -61,7 +61,7 @@ A reducer is a function that takes the current state and an action and returns a
 
 Creates a new store instance.
 ```ts
-new RxStore<S>(reducer: Reducer<S>, initialState: S);
+new RxStore<S, A extends Action>(reducer: Reducer<S, A>, initialState: S);
 ```
 
 #### `RxStore.prototype.state`
