@@ -17,7 +17,7 @@ export type Reducer<S> = (state: S, action: Action) => S;
 export class RxStore<S> extends Observable<S> {
 
   state: S;
-  private actions$: Subject<Action>;
+  readonly actions$: Subject<Action>;
 
   constructor(reducer: Reducer<S>, initialState: S) {
     const actions$ = new Subject<Action>();
