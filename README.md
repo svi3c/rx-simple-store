@@ -20,6 +20,9 @@ This is fine for apps. But if you want to write reusable feature modules with so
 
 I'm pretty sure that there are other use cases where you want to have multiple stores instead of a single store.
 
+There is another [rx-store](https://github.com/jdlehman/rx-store) project, but it's missing TypeScript typings.
+I thought about adding typings, but then I decided to create a new (and imo more concise) API.
+
 ## RxStore
 
 The class that you will be working with is called `RxStore`. It is an Observable with a `dispatch()` method. If you want to react to changes, you can subscribe to it and if you want to trigger a state recalculation, you can `dispatch()` an `Action`. It also holds a reference to the current `state` to gain quick access.
