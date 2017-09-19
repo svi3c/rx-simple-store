@@ -23,14 +23,30 @@
     "prepublish": "npm run build",
     "build": "rimraf lib && tsc && tsc --outDir ./lib/es2015 --module es6",
     "lint": "tslint 'src/**/*.ts'",
-    "test": "npm run lint && jasmine-ts 'src/**/*.spec.ts'"
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.ts$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "src\\/.*\\.spec\\.ts$",
+    "moduleFileExtensions": ["ts", "js"]
+  },
+  "lint-staged": {
+    "*.ts": ["prettier --write", "git add"]
+  },
+  "prettier": {
+    "trailingComma": "all"
   },
   "devDependencies": {
-    "@types/jasmine": "^2.5.47",
-    "jasmine-promise-wrapper": "^0.0.2",
-    "jasmine-spec-reporter": "^4.1.0",
-    "jasmine-ts": "^0.1.2",
+    "@types/jest": "^20.0.8",
+    "husky": "^0.14.3",
+    "jest": "^21.1.0",
+    "lint-staged": "^4.2.1",
+    "prettier": "^1.7.0",
     "rimraf": "^2.6.1",
+    "ts-jest": "^21.0.1",
     "tslint": "^5.1.0",
     "typescript": "^2.3.2"
   },

@@ -7,9 +7,7 @@ import "rxjs/add/operator/publishReplay";
 import "rxjs/add/operator/scan";
 import "rxjs/add/operator/startWith";
 
-export type Partial<T> = {
-    [P in keyof T]?: T[P];
-};
+export type Partial<T> = { [P in keyof T]?: T[P] };
 
 export interface Action {
   type: string;
@@ -27,7 +25,7 @@ function extendReducer<S, A extends Action>(reducer: Reducer<S, A>) {
   return (state: S, action: A | SetAction) => {
     if (action.type === "[RX_STORE] SET") {
       if (typeof state === "object") {
-        return { ...(state as any as object), ...action.payload };
+        return { ...((state as any) as object), ...action.payload };
       } else {
         throw new Error("Cannot use setter on store with non-object state");
       }
@@ -38,7 +36,6 @@ function extendReducer<S, A extends Action>(reducer: Reducer<S, A>) {
 }
 
 export class RxStore<S, A extends Action> extends Observable<S> {
-
   state: S;
   readonly actions$: Subject<A>;
 
@@ -56,7 +53,7 @@ export class RxStore<S, A extends Action> extends Observable<S> {
     super((observer: Observer<S>) => {
       state$.subscribe(observer);
     });
-    state$.subscribe((state) => {
+    state$.subscribe(state => {
       this.state = state;
     });
     this.actions$ = actions$;
@@ -69,5 +66,4 @@ export class RxStore<S, A extends Action> extends Observable<S> {
   set(partialState: Partial<S>) {
     this.dispatch({ type: "[RX_STORE] SET", payload: partialState } as A);
   }
-
 }

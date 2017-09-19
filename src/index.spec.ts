@@ -1,4 +1,3 @@
-import { it } from "jasmine-promise-wrapper";
 import { RxStore } from "./index";
 
 import "rxjs/add/operator/delay";
@@ -7,7 +6,6 @@ import "rxjs/add/operator/toPromise";
 import { Subscription } from "rxjs/Subscription";
 
 describe("RxStore", () => {
-
   let subscription: Subscription;
 
   afterEach(() => {
@@ -28,9 +26,8 @@ describe("RxStore", () => {
   });
 
   describe("one observer", () => {
-
     it("should be notified with the current state on subscription", async () => {
-      const store = new RxStore((state) => state, 0);
+      const store = new RxStore(state => state, 0);
 
       const initial = await store.take(1).toPromise();
 
@@ -41,17 +38,23 @@ describe("RxStore", () => {
       const store = new RxStore((state, action) => action.payload, 0);
 
       store.dispatch({ type: "foo", payload: 1 });
-      const updated = await store.delay(100).take(1).toPromise();
+      const updated = await store
+        .delay(100)
+        .take(1)
+        .toPromise();
 
       expect(updated).toEqual(1);
     });
 
     it("should not be notified when the same state object is returned", () => {
       let count = 0;
-      const store = new RxStore((state, action) => {
-        state.foo = action.payload;
-        return state;
-      }, { foo: 0 });
+      const store = new RxStore(
+        (state, action) => {
+          state.foo = action.payload;
+          return state;
+        },
+        { foo: 0 },
+      );
 
       subscription = store.subscribe(() => {
         count++;
@@ -63,13 +66,11 @@ describe("RxStore", () => {
 
       expect(count).toEqual(1);
     });
-
   });
 
   describe("multiple observers", () => {
-
     it("should be notified with the current state on subscription", async () => {
-      const store = new RxStore((state) => state, 0);
+      const store = new RxStore(state => state, 0);
 
       const initial1 = await store.take(1).toPromise();
       const initial2 = await store.take(1).toPromise();
@@ -82,10 +83,10 @@ describe("RxStore", () => {
       const states1: number[] = [];
       const states2: number[] = [];
       const store = new RxStore((state, action) => action.payload, 0);
-      const sub1 = store.subscribe((state) => {
+      const sub1 = store.subscribe(state => {
         states1.push(state);
       });
-      const sub2 = store.subscribe((state) => {
+      const sub2 = store.subscribe(state => {
         states2.push(state);
       });
       subscription = sub1.add(sub2);
@@ -97,11 +98,9 @@ describe("RxStore", () => {
       expect(states1).toEqual([0, 1, 2, 3]);
       expect(states2).toEqual([0, 1, 2, 3]);
     });
-
   });
 
   describe("set()", () => {
-
     it("should trigger a partial state update on the store", () => {
       const store = new RxStore((state, action) => state, { a: "b", c: "" });
 
@@ -114,11 +113,12 @@ describe("RxStore", () => {
       const store = new RxStore((state, action) => state, { a: "b", c: "" });
 
       const actionPromise = store.actions$.take(1).toPromise();
-      store.set({c: "d"});
+      store.set({ c: "d" });
 
-      expect(await actionPromise).toEqual({type: "[RX_STORE] SET", payload: {c: "d"}});
+      expect(await actionPromise).toEqual({
+        payload: { c: "d" },
+        type: "[RX_STORE] SET",
+      });
     });
-
   });
-
 });
