@@ -2,58 +2,46 @@
 
 # rx-simple-store
 
-This is a simple [rxjs 5](https://github.com/ReactiveX/RxJS) isomorphic implementation of a reactive store, written in TypeScript.
+This is an isomorphic distributed [rxjs 5](https://github.com/ReactiveX/RxJS) implementation of a reactive store, written in TypeScript.
 
-I was inspired by the article [Redux in a single line of code with RxJS](http://rudiyardley.com/redux-single-line-of-code-rxjs/) by Rudi Yardley.
+## History
 
-## What is a reactive store?
+I was originally inspired by the article [Redux in a single line of code with RxJS](http://rudiyardley.com/redux-single-line-of-code-rxjs/) by Rudi Yardley.
 
-A reactive store is an application state management solution. It consumes actions and publishes new states via Observables. This way you can react on state changes accross your application.
+Then I switched to a more [mobx](https://mobx.js.org/)-like implementation. I liked the idea of having actions as simple
+methods on the store.
 
-To get a better understanding of reactive stores, take a look at [redux](http://redux.js.org/docs/introduction/).
+So in version 0.2.0 I did a rewrite:
+Instead of working with actions as objects like in redux, we now add actions as methods to our store implementations.
 
 ## Why another store solution?
 
-At the moment I write some applications in [Angular](https://angular.io/). There is the [@ngrx/store](https://github.com/ngrx/store) which allows you to have one large application state.
+At the moment I write some applications in [Angular](https://angular.io/) and [React](https://facebook.github.io/react/).
 
-This is fine for apps. But if you want to write reusable feature modules with some components and services, you might consider to have dedicated stores for your independent modules.
+* There is the [@ngrx/store](https://github.com/ngrx/store) or [redux](http://redux.js.org/docs/introduction/Motivation.html) which allows you to have a centralized application state.
 
-I'm pretty sure that there are other use cases where you want to have multiple stores instead of a single store.
+  This is a nice solution for a lot of applications. With the great redux dev tools, you can keep track of your actions.
 
-There is another [rx-store](https://github.com/jdlehman/rx-store) project, but it's missing TypeScript typings.
-I thought about adding typings, but then I decided to create a new (and imo more concise) API.
+* On the other hand there is [mobx](https://mobx.js.org/) which is a distributed store and works with it's own observables.
 
-## RxStore
+### Advantages over the alternatives
 
-The class that you will be working with is called `RxStore`. It is an Observable with a `dispatch()` method. If you want to react to changes, you can subscribe to it and if you want to trigger a state recalculation, you can `dispatch()` an `Action`. It also holds a reference to the current `state` to gain quick access.
+* In @ngrx/store and redux you have to create a lot of boilerplate code to finally get your store set-up and you have to jump through a lot of files when you want to change a behavior.
 
+  With the RxStore you have everything from the actions to to the state within one file (like in mobx).
 
-The constructor takes a `Reducer` function and an `initialState` object.
-The `Reducer` function handles the actions and may derive and return a new succeding state that will be stored and published.
+* Mobx is larger than this small library and it has it's own observable implementation which is unlikely to be reused by a library consumer.
 
-It is important to treat the state *immutable*. To achieve this, I recommend to use the spread operator for [arrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator) and [objects](http://redux.js.org/docs/recipes/UsingObjectSpreadOperator.html) (ES6, supported by Babel and TypeScript).
+  Since this library uses rxjs, it has a very small size (it's only one class).
+  And rxjs is very light, too (when you include only the operators you need into your application).
+  If you use Angular, you have rxjs as an implicit dependency anyways.
 
-Since the reducer is a pure function, it is quite easy to test.
+### Disadvantages over the alternatives
+
+* Hot-Module-Reloading might be easier to be implemented with a central store solution.
+* @ngrx/store and redux have an action history log and you can simply modify it with the dev tools to get a different resulting state. This is not a feature of mobx or this store.
 
 ## API
-
-
-### Action interface
-
-An action has a type which serves as a discriminator and an optional payload.
-```ts
-interface Action {
-  type: string;
-  payload?: any;
-}
-```
-
-### Reducer interface
-
-A reducer is a function that takes the current state and an action and returns a state.
-```ts
-type Reducer<S, A extends Action> = (state: S, action: A) => S
-```
 
 ### RxStore
 
@@ -61,24 +49,30 @@ type Reducer<S, A extends Action> = (state: S, action: A) => S
 
 Creates a new store instance.
 ```ts
-new RxStore<S, A extends Action>(reducer: Reducer<S, A>, initialState: S);
+new RxStore<S>(initialState: S, options?: RxStoreOptions);
 ```
 
 #### `RxStore.prototype.state`
 
-This is a reference to the current state.
+This is a reference to the current state snapshot.
 
-#### `RxStore.prototype.actions$`
+#### `RxStore.prototype.state$`
 
-The `actions$` is a rxjs `Subject<Action>`. You can use this reference to add side effects when actions are dispatched.
+The `state$` is a rxjs `Observable<S>`. Here you can subscribe for state updates.
 
-#### `RxStore.prototype.dispatch(action: Action)`
+#### `RxStore.prototype.propagate(patch: Partial<S>)` (protected)
 
-This takes an `Action` and notifies the `actions$` Subject. Then the reducer is called to retrieve the resulting state.
+This is an internal method that can be used by your store actions to propagate state changes.
 
-#### `RxStore.prototype.set(partialState: Partial<S>)`
+### `RxStoreOptions`
 
-A shortcut method to trigger a partial state update. A predefined action of type `[RX_STORE] SET` will be emitted. Note: This is a reserved action type.
+#### `debug?: boolean`
+
+Determines whether the the state changes of the store are logged to the console.
+
+#### `mutateState?: boolean`
+
+Determines whether the state should be mutated when calling `propagate`.
 
 ## A Todo Example
 
@@ -90,87 +84,47 @@ interface Todo {
   done: boolean;
 }
 
-type TodoState = {
+interface State {
   todos: Todo[];
-};
-
-interface AddTodoAction {
-  type: "ADD_TODO";
-  payload: Todo;
 }
 
-interface ToggleTodoAction {
-  type: "TOGGLE_TODO";
-  payload: string;
-}
+class TodoStore extends RxStore<State> {
+  addTodo(todo: Todo) {
+    this.propagate({
+      todos: [...this.state.todos, todo],
+    });
+  }
 
-interface RemoveTodoByNameAction {
-  type: "REMOVE_TODO";
-  payload: string;
-}
-
-type TodoAction = AddTodoAction | ToggleTodoAction | RemoveTodoByNameAction;
-
-const reducer = (state: TodoState, action: TodoAction) => {
-  switch (action.type) {
-    case "ADD_TODO":
-      return {todos: [...state.todos, action.payload]};
-    case "TOGGLE_TODO":
-      const toggleIndex = state.todos.findIndex((todo) => todo.text === action.payload);    
-      const todo = state.todos[toggleIndex];
-      return {
-        todos: [
-          ...state.todos.slice(0, toggleIndex),
-          {...todo, done: !todo.done},
-          ...state.todos.slice(toggleIndex + 1)
-        ]
-      }
-    case "REMOVE_TODO":
-      const removeIndex = state.todos.findIndex((todo) => todo.text === action.payload);
-      return {
-        todos: [
-          ...state.todos.slice(0, removeIndex),
-          ...state.todos.slice(removeIndex + 1)
-        ]
-      };
-    default:
-      return state;
+  updateTodo(idx: number, todo: Partial<Todo>) {
+    const todos = this.state.todos;
+    this.propagate({
+      todos: [
+        ...todos.slice(0, idx),
+        Object.assign(todos[idx], todo),
+        ...todos.slice(idx + 1),
+      ],
+    });
   }
 }
 
-const store$ = new RxStore(reducer, {todos: []});
+const todoStore = new TodoStore({ todos: [] });
 
-store$.subscribe(state => console.log(state.todos.length));
-// log: 0
-store$.dispatch({ type: "ADD_TODO", payload: {text: "read this example", done: false} });
-// log: 1
-store$.dispatch({ type: "ADD_TODO", payload: {text: "learn typescript", done: false} });
-// log: 2
-store$.dispatch({ type: "ADD_TODO", payload: {text: "foobar", done: false} });
-// log: 3
-store$.dispatch({ type: "ADD_TODO", payload: {text: "learn rxjs", done: false} });
-// log: 4
-store$.dispatch({ type: "TOGGLE_TODO", payload: "read this example" });
-// log: 4
-store$.dispatch({ type: "REMOVE_TODO", payload: "foobar" });
-// log: 3
+todoStore.addTodo({ text: "Read the docs", done: false });
+todoStore.updateTodo(0, { done: true });
+todoStore.addTodo({ text: "Use it", done: false });
+todoStore.updateTodo(1, { text: "Apply it" });
 
-console.log(JSON.stringify(store$.state, null, 2));
-// log:
+// state:
 // ​​​​​{​​​​​
 // ​​​​​  "todos": [​​​​​
 // ​​​​​    {​​​​​
-// ​​​​​      "text": "read this example",​​​​​
+// ​​​​​      "text": "Read the docs",​​​​​
 // ​​​​​      "done": true​​​​​
 // ​​​​​    },​​​​​
 // ​​​​​    {​​​​​
-// ​​​​​      "text": "learn typescript",​​​​​
+// ​​​​​      "text": "Apply it",​​​​​
 // ​​​​​      "done": false​​​​​
-// ​​​​​    },​​​​​
-// ​​​​​    {​​​​​
-// ​​​​​      "text": "learn rxjs",​​​​​
-// ​​​​​      "done": false​​​​​
-// ​​​​​    }​​​​​
+// ​​​​​    }​
 // ​​​​​  ]​​​​​
 // ​​​​​}​​​
 ```

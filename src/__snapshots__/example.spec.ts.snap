@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Example should result in the correct state 1`] = `
+Object {
+  "todos": Array [
+    Object {
+      "done": true,
+      "text": "Read the docs",
+    },
+    Object {
+      "done": false,
+      "text": "Apply it",
+    },
+  ],
+}
+`;
