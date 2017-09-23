@@ -22,9 +22,9 @@ At the moment I write some applications in [Angular](https://angular.io/) and [R
 
   This is a nice solution for a lot of applications. With the great redux dev tools, you can keep track of your actions.
 
-* On the other hand there is [mobx](https://mobx.js.org/) which is a distributed store and works with it's own observables.
+* On the other hand there is [mobx](https://mobx.js.org/) which is a distributed store and works with it's own observable implementation.
 
-### Advantages over the alternatives
+### Advantages
 
 * In @ngrx/store and redux you have to create a lot of boilerplate code to finally get your store set-up and you have to jump through a lot of files when you want to change a behavior.
 
@@ -36,7 +36,7 @@ At the moment I write some applications in [Angular](https://angular.io/) and [R
   And rxjs is very light, too (when you include only the operators you need into your application).
   If you use Angular, you have rxjs as an implicit dependency anyways.
 
-### Disadvantages over the alternatives
+### Drawbacks
 
 * Hot-Module-Reloading might be easier to be implemented with a central store solution.
 * @ngrx/store and redux have an action history log and you can simply modify it with the dev tools to get a different resulting state. This is not a feature of mobx or this store.
@@ -127,4 +127,61 @@ todoStore.updateTodo(1, { text: "Apply it" });
 // ​​​​​    }​
 // ​​​​​  ]​​​​​
 // ​​​​​}​​​
+```
+
+## Usage with angular
+
+In angular you can simply subclass the RxStore and inject it to your components.
+
+### Example
+
+Store (similar to example above):
+```ts
+// ...
+
+@Injectable()
+export class TodoStore extends RxStore<State> {
+  // ...
+}
+```
+
+Component:
+
+```ts
+@Component({
+  // ...
+})
+export class TodosComponent {
+  todos$ = this.todosStore.state$.map(state => state.todos);
+
+  constructor(public todosStore: TodosStore) {
+  }
+}
+```
+
+
+## Usage with react, inferno or preact
+
+If you use react or a react-like library, you can connect a stateful component to a store by using the connect decorator.
+
+### Example:
+
+```ts
+import { connect } from "rx-simple-store";
+
+interface State {
+  todos: TodosStore;
+}
+
+@connect({ todos: todosStore })
+export class Todos extends Component<{}, State> {
+  render() {
+    const todos = this.state.todos;
+    return (
+      <ul>
+        {todos.todos.map(todo => (<li>{todo.text}</li>))}
+      </ul>
+    );
+  }
+}
 ```
