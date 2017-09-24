@@ -35,9 +35,7 @@ export function connect(stores: Stores) {
       this.subscription = new Subscription();
       Object.keys(stores).forEach(name =>
         this.subscription.add(
-          stores[name].state$.subscribe(state =>
-            this.setState({ [name]: state }),
-          ),
+          stores[name].subscribe(state => this.setState({ [name]: state })),
         ),
       );
     });

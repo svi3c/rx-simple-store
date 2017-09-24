@@ -12,7 +12,7 @@ interface State {
 class TodoStore extends RxStore<State> {
   // This action is not mutating the state
   addTodo(todo: Todo) {
-    this.propagate({
+    this.publish({
       todos: [...this.state.todos, todo],
     });
   }
@@ -20,7 +20,7 @@ class TodoStore extends RxStore<State> {
   // This action is mutating the state
   updateTodo(idx: number, todo: Partial<Todo>) {
     const todos = this.state.todos;
-    this.propagate({
+    this.publish({
       todos: [
         ...todos.slice(0, idx),
         Object.assign(todos[idx], todo),

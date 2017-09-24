@@ -60,9 +60,9 @@ This is a reference to the current state snapshot.
 
 The `state$` is a rxjs `Observable<S>`. Here you can subscribe for state updates.
 
-#### `RxStore.prototype.propagate(patch: Partial<S>)` (protected)
+#### `RxStore.prototype.publish(patch: Partial<S>)` (protected)
 
-This is an internal method that can be used by your store actions to propagate state changes.
+This is an internal method that can be used by your store actions to publish state changes.
 
 ### `RxStoreOptions`
 
@@ -72,7 +72,7 @@ Determines whether the the state changes of the store are logged to the console.
 
 #### `mutateState?: boolean`
 
-Determines whether the state should be mutated when calling `propagate`.
+Determines whether the state should be mutated when calling `publish`.
 
 ## A Todo Example
 
@@ -90,14 +90,14 @@ interface TodoState {
 
 class TodoStore extends RxStore<TodoState> {
   addTodo(todo: Todo) {
-    this.propagate({
+    this.publish({
       todos: [...this.state.todos, todo],
     });
   }
 
   updateTodo(idx: number, todo: Partial<Todo>) {
     const todos = this.state.todos;
-    this.propagate({
+    this.publish({
       todos: [
         ...todos.slice(0, idx),
         Object.assign(todos[idx], todo),

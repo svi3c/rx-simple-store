@@ -4,7 +4,7 @@ import { RxStore } from "./store";
 
 class TestStore extends RxStore<any> {
   someAction() {
-    this.propagate({ b: 2 });
+    this.publish({ b: 2 });
   }
 }
 

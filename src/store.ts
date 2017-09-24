@@ -10,17 +10,21 @@ export interface RxStoreOptions {
  * This abstract store is basically just holding a state and propagating state changes.
  * Whether this state is treated mutable or immutable is up to you.
  */
-export abstract class RxStore<S extends object> {
-  readonly state$: Observable<S>;
+export abstract class RxStore<S extends object> extends Observable<S> {
   private stateSubject: BehaviorSubject<S>;
+  private options: RxStoreOptions;
 
   get state() {
     return this.stateSubject.value;
   }
 
-  constructor(initialState: S, private options: RxStoreOptions = {}) {
-    this.stateSubject = new BehaviorSubject(initialState);
-    this.state$ = this.stateSubject.asObservable();
+  constructor(initialState: S, options: RxStoreOptions = {}) {
+    const stateSubject = new BehaviorSubject(initialState);
+    super(observer => {
+      stateSubject.subscribe(observer);
+    });
+    this.stateSubject = stateSubject;
+    this.options = options;
   }
 
   /**
@@ -33,7 +37,7 @@ export abstract class RxStore<S extends object> {
    *   You pass in a partial state which reflects the state changes.
    * @param patch This partial state will be merged into the new resulting state.
    */
-  protected propagate(patch: Partial<S>) {
+  protected publish(patch: Partial<S>) {
     // tslint:disable-next-line:prefer-object-spread
     const state = this.options.mutateState
       ? Object.assign(this.state, patch)
