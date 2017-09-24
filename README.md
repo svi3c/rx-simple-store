@@ -84,11 +84,11 @@ interface Todo {
   done: boolean;
 }
 
-interface State {
+interface TodoState {
   todos: Todo[];
 }
 
-class TodoStore extends RxStore<State> {
+class TodoStore extends RxStore<TodoState> {
   addTodo(todo: Todo) {
     this.propagate({
       todos: [...this.state.todos, todo],
@@ -140,7 +140,7 @@ Store (similar to example above):
 // ...
 
 @Injectable()
-export class TodoStore extends RxStore<State> {
+export class TodoStore extends RxStore<TodoState> {
   // ...
 }
 ```
@@ -152,9 +152,9 @@ Component:
   // ...
 })
 export class TodosComponent {
-  todos$ = this.todosStore.state$.map(state => state.todos);
+  todos$ = this.todoStore.state$.map(state => state.todos);
 
-  constructor(public todosStore: TodosStore) {
+  constructor(public todoStore: TodoStore) {
   }
 }
 ```
@@ -170,10 +170,10 @@ If you use react or a react-like library, you can connect a stateful component t
 import { connect } from "rx-simple-store";
 
 interface State {
-  todos: TodosStore;
+  todos: TodoState;
 }
 
-@connect({ todos: todosStore })
+@connect({ todos: todoStore })
 export class Todos extends Component<{}, State> {
   render() {
     const todos = this.state.todos;
