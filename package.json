@@ -1,6 +1,6 @@
 {
   "name": "rx-simple-store",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A simple rx store solution written in TypeScript",
   "main": "lib/index.js",
   "module": "lib/es2015/index.js",
